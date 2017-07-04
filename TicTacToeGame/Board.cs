@@ -1,15 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TicTacToeGame
 {
     /// <summary>
     /// GameState enum would provide possible outcomes of the Game.
     /// </summary>
-    enum GameState { Playing, Draw, Tic_Won, Cross_Won };
+    enum GameState { Playing, Draw, Nought_Won, Cross_Won };
+
+    enum Players { First, Second };
 
     /// <summary>
     /// Gets of sets the state of the board and decides the outcome of the Game.
@@ -18,15 +16,16 @@ namespace TicTacToeGame
     {
         private int Rows;
         private int Cols;
-        int currentRow, currentCol;
+        int WinningSequence;
         Cell[][] cells;
         /// <summary>
         /// Board creation will set number of rows and cols and array of Cell class.
         /// </summary>
-        public Board(int Row, int Col)
+        public Board(int Row, int Col, int ws)
         {
             Rows = Row;
             Cols = Col;
+            WinningSequence = ws;
             cells = new Cell[Row][];
             for(int i=0; i<Row; i++)
             {
@@ -43,7 +42,6 @@ namespace TicTacToeGame
 
         }
 
-
         public bool IsCellAvailable()
         {
             for(int i=0; i<Rows; i++)
@@ -51,19 +49,13 @@ namespace TicTacToeGame
                 for(int j=0; j<Cols; j++)
                 {
                     if(cells[i][j].Cs == CellState.Nothing)
-                    { return false; }
+                    { return true; }
                 }
             }
-            return true;
+            return false;
         }
 
-        public void isDraw()
-        {
-            if (IsCellAvailable())
-                Console.WriteLine("The Game is Draw");
-        }
-
-        public void getBoard()
+        public void GetBoard()
         {
             for (int row = 0; row < Rows; ++row)
             {
@@ -89,5 +81,28 @@ namespace TicTacToeGame
                 Console.WriteLine();
             }
         }
+
+        public bool UpdateBoard(Tuple<int,int> move, Players p)
+        {
+            if (cells[move.Item1 -1][move.Item2 -1].Cs == CellState.Nothing)
+            {
+                if (p == Players.First)
+                {
+                    cells[move.Item1 - 1][move.Item2 - 1].Cs = CellState.Cross;
+                }
+                else
+                {
+                    cells[move.Item1 - 1][move.Item2 - 1].Cs = CellState.Tic;
+                }
+                return true;
+            }
+            return false;
+        }
+
+        
+
+        
+
+         
     }
 }

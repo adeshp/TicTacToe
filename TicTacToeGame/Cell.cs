@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TicTacToeGame
+﻿namespace TicTacToeGame
 {
-    
+
 
     /// <summary>
     /// CellState enum would provide state of the cell. Only below states are permitted.
@@ -24,20 +18,19 @@ namespace TicTacToeGame
     {
 
         public CellState Cs;
-        //private int Row { get; set; }
-        //private int Col { get; set; }
 
         public Cell()
         {
-            //Row = row;
-            //Col = col;
             Cs = CellState.Nothing;
-            //Initialize();
         }
 
-        public void Initialize()
+        /// <summary>
+        /// Set the cell status for each player.
+        /// </summary>
+        /// <param name="Cs"></param>
+        public void SetCellStatus(CellState Cs)
         {
-            Cs = CellState.Nothing;
+            this.Cs = Cs;
         }
 
         /// <summary>
@@ -58,8 +51,5 @@ namespace TicTacToeGame
             }
 
         }
-
-
-
     }
 }
