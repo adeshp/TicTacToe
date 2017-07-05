@@ -189,18 +189,235 @@ namespace TicTacToeGame
             if (b.IsCellAvailable())
             {
 
-                return WhoWon(b);
+                var cellState = WhoWon(b);
+                if(cellState == CellState.Cross)
+                {
+                    return GameState.Cross_Won;
+                }
+                else if(cellState == CellState.Tic)
+                {
+                    return GameState.Nought_Won;
+                }
+                else
+                {
+                    return GameState.Playing;
+                }
             }
             return GameState.Draw;
         }
 
         /// <summary>
         /// Method to decide the winner.
+        /// 1. Check if either cross or nought are in consecutive cells and their length >= winningSequence
+        ///     a. either in a row
+        ///     b. or in a column
+        ///     c. or in a diagonal
+        /// 2. We don't need to scan the entire row/col:
+        ///     a. We know that winning sequence is greater than the board dimensions/2
+        ///        so we will keep a check about how many cells in a row/cell are scanned
+        ///        once they cross winning sequence length, we will move to next row/col.
+        ///     b. For diagonal, we will only scan those diagonals whose length is greater than 
+        ///        the winning sequence and we will apply the same strategy from 2.a
+        /// 3. We will keep a toggle variable to know which is the current mark we are scanning 'x' or 'o'.
+        /// 4. If we find the winning sequence, we will return the mark.
+        /// 5. Based upon the mark, we can say if either Player1 or Player2 has won.
         /// </summary>
         /// <returns></returns>
-        public static GameState WhoWon(Board b)
+        public static CellState WhoWon(Board b)
         {
-            return GameState.Playing;
+            CellState u = CellState.Nothing;
+            //1. start scanning rows.
+            u = WonOnRows(b);
+
+            //2. start scanning cols.
+            if(u == CellState.Nothing)
+            {
+                u = WonOnCols(b);
+            }
+
+            //3. start scanning diagonals from top left.
+            if(u == CellState.Nothing)
+            {
+                u = WonOnTopLeftDiagonalsScan(b);
+            }
+
+            //4. start scanning diagonals from top right.
+            if (u == CellState.Nothing)
+            {
+                u = WonOnTopRightDiagonalsScan(b);
+            }
+
+            return u; // this returns means, still not finished.
         }
+
+        public static CellState WonOnRows(Board b)
+        {
+            int i = 0, j = 0;
+            for (i = 0; i < b.Rows; i++)
+            {
+                CellState cs = CellState.Nothing;
+                int winCount = 0;
+                CellState previousCellValue = CellState.Nothing;
+                for (j = 0; j < b.Cols; j++)
+                {
+                    if (b.cells[i][j].Cs != CellState.Nothing)
+                    {
+                        cs = b.cells[i][j].Cs;
+                        if(j == 0)
+                        {
+                            previousCellValue = cs;
+                        }
+                        if (cs == previousCellValue)
+                        {
+                            winCount++;
+                        }
+                        if (winCount >= b.WinningSequence)
+                        {
+                            return cs;
+                        }
+                        if (winCount > 1)
+                        {
+                            if (cs != previousCellValue) //switch the mark from x to o and o to x.
+                            {
+                                winCount = 1;
+                            }
+                        }
+                    }
+                    previousCellValue = cs;
+                    if (j > b.WinningSequence)
+                        break;
+                }
+
+            }
+            return CellState.Nothing;
+        }
+
+        public static CellState WonOnCols(Board b)
+        {
+            int i = 0, j = 0;
+            for (i = 0; i < b.Cols; i++)
+            {
+                CellState cs = CellState.Nothing;
+                int winCount = 0;
+                CellState previousCellValue = CellState.Nothing;
+                for (j = 0; j < b.Rows; j++)
+                {
+                    if (b.cells[j][i].Cs != CellState.Nothing)
+                    {
+                        cs = b.cells[j][i].Cs;
+                        if (j == 0)
+                        {
+                            previousCellValue = cs;
+                        }
+                        if (cs == previousCellValue)
+                        {
+                            winCount++;
+                        }
+                        if (winCount >= b.WinningSequence)
+                        {
+                            return cs;
+                        }
+                        if (winCount > 1)
+                        {
+                            if (cs != previousCellValue) //switch the mark from x to o and o to x.
+                            {
+                                winCount = 1;
+                            }
+                        }
+                    }
+                    previousCellValue = cs;
+                    if (j > b.WinningSequence)
+                        break;
+                }
+
+            }
+            return CellState.Nothing;
+        }
+
+        public static CellState WonOnTopLeftDiagonalsScan(Board b)
+        {
+            int n = b.Cols;
+            int i = 0, j = 0;
+            for (i = 0; i < (n * 2) - 1; i++)
+            {
+                CellState cs = CellState.Nothing;
+                int winCount = 0;
+                int z = (i < n) ? 0 : i - n + 1;
+                CellState previousCellValue = CellState.Nothing;
+                for (j = z; j <= i - z; j++)
+                {
+                    if (b.cells[j][i - j].Cs != CellState.Nothing)
+                    {
+                        cs = b.cells[j][i - j].Cs;
+                        if (j == z)
+                        {
+                            previousCellValue = cs;
+                        }
+                        if (cs == previousCellValue)
+                        {
+                            winCount++;
+                        }
+                        if (winCount >= b.WinningSequence)
+                        {
+                            return cs;
+                        }
+                        if (winCount > 1)
+                        {
+                            if (cs != previousCellValue) //switch the mark from x to o and o to x.
+                            {
+                                winCount = 1;
+                            }
+                        }
+                        previousCellValue = cs;
+                    }
+
+                }
+            }
+            return CellState.Nothing;
+        }
+
+        public static CellState WonOnTopRightDiagonalsScan(Board b)
+        {
+            int n = b.Cols;
+            int i = 0, j = 0;
+            for (i = 0; i < (n * 2) - 1; i++)
+            {
+                CellState cs = CellState.Nothing;
+                int winCount = 0;
+                int z = (i < n) ? 0 : i - n + 1;
+                CellState previousCellValue = CellState.Nothing;
+                for (j = z; j <= i - z; j++)
+                {
+                    if (b.cells[j][(n - 1) - (i - j)].Cs != CellState.Nothing)
+                    {
+                        cs = b.cells[j][(n - 1) - (i - j)].Cs;
+                        if (j == z)
+                        {
+                            previousCellValue = cs;
+                        }
+                        if (cs == previousCellValue)
+                        {
+                            winCount++;
+                        }
+                        if (winCount >= b.WinningSequence)
+                        {
+                            return cs;
+                        }
+                        if (winCount > 1)
+                        {
+                            if (cs != previousCellValue) //switch the mark from x to o and o to x.
+                            {
+                                winCount = 1;
+                            }
+                        }
+                        previousCellValue = cs;
+                    }
+
+                }
+            }
+            return CellState.Nothing;
+        }
+
+
     }
 }

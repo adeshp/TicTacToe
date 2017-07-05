@@ -14,10 +14,10 @@ namespace TicTacToeGame
     /// </summary>
     class Board
     {
-        private int Rows;
-        private int Cols;
-        int WinningSequence;
-        Cell[][] cells;
+        public int Rows;
+        public  int Cols;
+        public int WinningSequence;
+        public Cell[][] cells;
         /// <summary>
         /// Board creation will set number of rows and cols and array of Cell class.
         /// </summary>
